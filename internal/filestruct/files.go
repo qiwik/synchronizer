@@ -4,25 +4,25 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"github.com/qiwik/synchronizer/internal/parameters/initial"
+	"github.com/qiwik/synchronizer/pkg/logger"
 	"io"
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"synchronizer/internal/parameters/initial"
-	"synchronizer/pkg/logger"
 )
 
 // FilesInfo consists of the information about passed file
 type FilesInfo struct {
-	Name string
+	Name  string
 	Exist bool
-	Hash string
-	Mode fs.FileMode
+	Hash  string
+	Mode  fs.FileMode
 }
 
 // FilesSearch compares files in the main folder and copy folder and performs actions on them.
 // Returns true if work was done
-func (m *MainFolder) FilesSearch(param initial.Parameters, copied *MainFolder, logs *logger.Logger) bool{
+func (m *MainFolder) FilesSearch(param initial.Parameters, copied *MainFolder, logs *logger.Logger) bool {
 	if len(m.Files) == 0 {
 		return true
 	}
@@ -40,11 +40,11 @@ func (m *MainFolder) FilesSearch(param initial.Parameters, copied *MainFolder, l
 				exist = true
 				err := os.Remove(param.CopyPath + "/" + m.Files[i].Name)
 				if err != nil {
-					logs.Errs.Printf("can't replace file %s\n", param.SourcePath + "/" + m.Files[i].Name)
+					logs.Errs.Printf("can't replace file %s\n", param.SourcePath+"/"+m.Files[i].Name)
 					break
 				}
 
-				err = CopyFile(param.SourcePath + "/" + m.Files[i].Name, param.CopyPath + "/" + m.Files[i].Name, logs, m.Files[i].Mode)
+				err = CopyFile(param.SourcePath+"/"+m.Files[i].Name, param.CopyPath+"/"+m.Files[i].Name, logs, m.Files[i].Mode)
 				if err != nil {
 					logs.Errs.Println(err)
 				}
@@ -54,11 +54,11 @@ func (m *MainFolder) FilesSearch(param initial.Parameters, copied *MainFolder, l
 
 		if exist != true {
 			copied.Files = append(copied.Files, &FilesInfo{
-				Name: m.Files[i].Name,
+				Name:  m.Files[i].Name,
 				Exist: true,
 			})
 
-			err := CopyFile(param.SourcePath + "/" + m.Files[i].Name, param.CopyPath + "/" + m.Files[i].Name, logs, m.Files[i].Mode)
+			err := CopyFile(param.SourcePath+"/"+m.Files[i].Name, param.CopyPath+"/"+m.Files[i].Name, logs, m.Files[i].Mode)
 			if err != nil {
 				logs.Errs.Println(err)
 			}
@@ -84,11 +84,11 @@ func (f *FoldersInfo) FilesSearch(openPath, createPath string, copied *FoldersIn
 				exist = true
 				err := os.Remove(createPath + "/" + f.Files[i].Name)
 				if err != nil {
-					logs.Errs.Printf("can't replace file %s\n", createPath + "/" + f.Files[i].Name)
+					logs.Errs.Printf("can't replace file %s\n", createPath+"/"+f.Files[i].Name)
 					break
 				}
 
-				err = CopyFile(openPath + "/" + f.Files[i].Name, createPath + "/" + f.Files[i].Name, logs, f.Files[i].Mode)
+				err = CopyFile(openPath+"/"+f.Files[i].Name, createPath+"/"+f.Files[i].Name, logs, f.Files[i].Mode)
 				if err != nil {
 					logs.Errs.Println(err)
 				}
@@ -98,11 +98,11 @@ func (f *FoldersInfo) FilesSearch(openPath, createPath string, copied *FoldersIn
 
 		if exist != true {
 			copied.Files = append(copied.Files, &FilesInfo{
-				Name: f.Files[i].Name,
+				Name:  f.Files[i].Name,
 				Exist: true,
 			})
 
-			err := CopyFile(openPath + "/" + f.Files[i].Name, createPath + "/" + f.Files[i].Name, logs, f.Files[i].Mode)
+			err := CopyFile(openPath+"/"+f.Files[i].Name, createPath+"/"+f.Files[i].Name, logs, f.Files[i].Mode)
 			if err != nil {
 				logs.Errs.Println(err)
 			}
@@ -132,10 +132,10 @@ func DeleteFiles(path string, files []*FilesInfo, logs *logger.Logger) {
 		if files[f].Exist != true {
 			err := os.Remove(path + "/" + files[f].Name)
 			if err != nil {
-				logs.Errs.Printf("can't remove file %s", path + "/" + files[f].Name)
+				logs.Errs.Printf("can't remove file %s", path+"/"+files[f].Name)
 				return
 			}
-			logs.Info.Printf("successfully removed file %s\n", path + "/" + files[f].Name)
+			logs.Info.Printf("successfully removed file %s\n", path+"/"+files[f].Name)
 		}
 	}
 }

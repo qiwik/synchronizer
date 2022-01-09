@@ -2,10 +2,10 @@ package appcloser
 
 import (
 	"fmt"
+	"github.com/qiwik/synchronizer/pkg/logger"
 	"log"
 	"os"
 	"os/signal"
-	"synchronizer/pkg/logger"
 	"syscall"
 )
 

@@ -1,18 +1,18 @@
 package copytest
 
 import (
+	"github.com/qiwik/synchronizer/internal/filestruct"
+	"github.com/qiwik/synchronizer/pkg/logger"
 	"github.com/stretchr/testify/require"
 	"io/fs"
 	"os"
-	"synchronizer/internal/filestruct"
-	"synchronizer/pkg/logger"
 	"testing"
 )
 
 var (
-	openPath = "in.txt"
-	copyPath = "out.txt"
-	mode fs.FileMode = 0777
+	openPath             = "in.txt"
+	copyPath             = "out.txt"
+	mode     fs.FileMode = 0777
 )
 
 var f *logger.Logger
@@ -23,14 +23,14 @@ func init() {
 }
 
 func BenchmarkFileCopy(b *testing.B) {
-	for i := 0; i <b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		filestruct.CopyFile(openPath, copyPath, f, mode)
 		os.Remove(copyPath)
 	}
 }
 
 func BenchmarkMakeDir(b *testing.B) {
-	for i := 0; i <b.N; i++ {
+	for i := 0; i < b.N; i++ {
 		filestruct.MakeDir("test", f, mode)
 		os.Remove("test")
 	}

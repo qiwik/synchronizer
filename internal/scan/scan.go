@@ -1,9 +1,9 @@
 package scan
 
 import (
+	"github.com/qiwik/synchronizer/internal/filestruct"
+	"github.com/qiwik/synchronizer/pkg/logger"
 	"io/ioutil"
-	"synchronizer/internal/filestruct"
-	"synchronizer/pkg/logger"
 )
 
 //amount of bytes in gigabyte
@@ -11,7 +11,7 @@ const gigabyte int64 = 1076741824
 
 //delta compensates a time error. secPerGb - average time for coping one GB. Every parameter in seconds
 var (
-	delta int64 = 60
+	delta    int64 = 60
 	secPerGb int64 = 20
 )
 
@@ -29,12 +29,12 @@ func PathScan(path string, tree *filestruct.FoldersInfo, logs *logger.Logger) er
 				Mode: elem.Mode(),
 			})
 
-			err = PathScan(path + "/" + elem.Name(), tree.Folders[len(tree.Folders)-1], logs)
+			err = PathScan(path+"/"+elem.Name(), tree.Folders[len(tree.Folders)-1], logs)
 			if err != nil {
-				logs.Errs.Printf("current path %s was not read correctly", path + "/" + elem.Name())
+				logs.Errs.Printf("current path %s was not read correctly", path+"/"+elem.Name())
 			}
 		} else {
-			currentHash, err := filestruct.GetMD5Hash(path + "/" + elem.Name(), logs)
+			currentHash, err := filestruct.GetMD5Hash(path+"/"+elem.Name(), logs)
 			if err != nil {
 				logs.Fatal.Fatal(err)
 			}
@@ -61,31 +61,31 @@ func MainPathScan(path string, tree *filestruct.MainFolder, logs *logger.Logger)
 	}
 
 	for _, elem := range elems {
-			if elem.IsDir() {
-				tree.Folders = append(tree.Folders, &filestruct.FoldersInfo{
-					Name: elem.Name(),
-					Mode: elem.Mode(),
-				})
+		if elem.IsDir() {
+			tree.Folders = append(tree.Folders, &filestruct.FoldersInfo{
+				Name: elem.Name(),
+				Mode: elem.Mode(),
+			})
 
-				err = PathScan(path+"/"+elem.Name(), tree.Folders[len(tree.Folders)-1], logs)
-				if err != nil {
-					logs.Errs.Printf("current path %s was not read correctly", path+"/"+elem.Name())
-				}
-				mainSize += elem.Size()
-			} else {
-				currentHash, err := filestruct.GetMD5Hash(path + "/" + elem.Name(), logs)
-				if err != nil {
-					logs.Fatal.Fatal(err)
-				}
-				tree.Files = append(tree.Files, &filestruct.FilesInfo{
-					Name: elem.Name(),
-					Hash: currentHash,
-					Mode: elem.Mode(),
-				})
-				mainSize += elem.Size()
+			err = PathScan(path+"/"+elem.Name(), tree.Folders[len(tree.Folders)-1], logs)
+			if err != nil {
+				logs.Errs.Printf("current path %s was not read correctly", path+"/"+elem.Name())
 			}
+			mainSize += elem.Size()
+		} else {
+			currentHash, err := filestruct.GetMD5Hash(path+"/"+elem.Name(), logs)
+			if err != nil {
+				logs.Fatal.Fatal(err)
+			}
+			tree.Files = append(tree.Files, &filestruct.FilesInfo{
+				Name: elem.Name(),
+				Hash: currentHash,
+				Mode: elem.Mode(),
+			})
+			mainSize += elem.Size()
+		}
 	}
 	logs.Info.Printf("work with %s finished\n", path)
-	ticker := (mainSize/gigabyte) * secPerGb + delta
+	ticker := (mainSize/gigabyte)*secPerGb + delta
 	return ticker, nil
 }
